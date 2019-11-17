@@ -1,0 +1,70 @@
+buildscript {
+    ext {
+        kotlinVersion = '1.3.50'
+        quarkusVersion = '1.0.0.CR1'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.quarkus:quarkus-gradle-plugin:${quarkusVersion}"
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+    }
+}
+
+plugins {
+    id 'io.quarkus' version '1.0.0.CR1'
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-jpa'
+
+group = 'com.mkleimann'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+quarkus {
+    setSourceDir("src/main/kotlin")
+    setOutputDirectory("build/classes/kotlin/main")
+
+    buildNative {
+        setAdditionalBuildArgs(["-H:EnableURLProtocols=http"])
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: "${kotlinVersion}"
+
+    implementation enforcedPlatform("io.quarkus:quarkus-bom:${quarkusVersion}")
+    implementation "io.quarkus:quarkus-kotlin:${quarkusVersion}"
+    implementation "io.quarkus:quarkus-resteasy-jackson:${quarkusVersion})"
+    implementation "io.quarkus:quarkus-jdbc-h2:${quarkusVersion}"
+    implementation "io.quarkus:quarkus-hibernate-orm-panache:${quarkusVersion}"
+
+    implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.2.0.Final'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-modules-java8', version: '2.10.0', ext: 'pom'
+
+    testCompile group: 'io.quarkus', name: 'quarkus-junit5', version: "${quarkusVersion}"
+    testCompile(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
+        exclude(module: 'activation')
+        exclude(module: 'jaxb-osgi')
+    }
+}
